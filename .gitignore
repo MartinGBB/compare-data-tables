@@ -1,0 +1,16 @@
+venv/
+.venv/
+data_csv/*
+
+!data_csv/.gitkeep
+
+*.xlsx
+*.csv
+
+__pycache__/
+*.py[cod]
+*$py.class
+.vscode/
+
+Thumbs.db
+.DS_Store
