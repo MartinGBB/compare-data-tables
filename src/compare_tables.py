@@ -6,18 +6,19 @@ class CompareTables:
     self.data_acp = data_acp
     self.key_column = key_column
 
-  def _execute_merge(self, join_direction):
-    merge = pd.merge(self.data_prod, self.data_acp, on=self.key_column, how=join_direction, suffixes=('_PROD', '_ACP'), indicator=True)
-    return merge
+    self.df_left = pd.merge(self.data_prod, self.data_acp, on=self.key_column, how='left', suffixes=('_PROD', '_ACP'), indicator=True)
+    self.df_right = pd.merge(self.data_prod, self.data_acp, on=self.key_column, how='right', suffixes=('_PROD', '_ACP'), indicator=True)
 
   def exclusives_prod(self):
-    return self._execute_merge(join_direction='left')
-  
+    # Filtro apenas os exclusivos
+    df = self.df_left[self.df_left['_merge'] == 'left_only'].copy()
+    df['Status_Comparacao'] = 'Exclusivo em Prod (Faltando em ACP)'
+    df.drop(columns=['_merge'], inplace=True)
+    return df
+
   def exclusives_acp(self):
-    return self._execute_merge(join_direction='right')
-  
-  def exclusives_prod_len(self):
-    return len(self.exclusives_prod()[self.exclusives_prod()['_merge'] == 'left_only'])
-  
-  def exclusives_acp_len(self):
-    return len(self.exclusives_acp()[self.exclusives_acp()['_merge'] == 'right_only'])
+    # Filtro apenas os exclusivos
+    df = self.df_right[self.df_right['_merge'] == 'right_only'].copy()
+    df['Status_Comparacao'] = 'Exclusivo em ACP (Faltando em Prod)'
+    df.drop(columns=['_merge'], inplace=True)
+    return df
