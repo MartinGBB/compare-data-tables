@@ -1,3 +1,5 @@
+import sys
+
 from environment_data import EnvironmentData
 from compare_tables import CompareTables
 from generate_report import GenerateReport
@@ -9,8 +11,12 @@ FILE_CSV_ACP = 'AT_PREPARE_STEP_ACP'
 CSV_PATH = r'..\data_csv'
 
 print("Carregando arquivos...")
-data_prod = EnvironmentData('PROD', CSV_PATH, FILE_CSV_PROD).load_data()
-data_acp = EnvironmentData('ACP', CSV_PATH, FILE_CSV_ACP).load_data()
+try:
+  data_prod = EnvironmentData('PROD', CSV_PATH, FILE_CSV_PROD).load_data()
+  data_acp = EnvironmentData('ACP', CSV_PATH, FILE_CSV_ACP).load_data()
+except FileNotFoundError as erro:
+  print("\nErro: Arquivo CSV não encontrado!")
+  sys.exit(1)
 
 print("Cruzando dados...")
 auditor = CompareTables(data_prod, data_acp, key_column='ID')
