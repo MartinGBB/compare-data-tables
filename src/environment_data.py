@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import Literal
 
-class Environment:
+class EnvironmentData:
   def __init__(self, environment_type: Literal['PROD', 'ACP'], path: str, file_csv: str):
     
     if environment_type not in ('PROD', 'ACP'):
