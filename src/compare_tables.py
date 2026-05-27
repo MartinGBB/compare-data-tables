@@ -9,14 +9,14 @@ class CompareTables:
     self.df_left = pd.merge(self.data_prod, self.data_acp, on=self.key_column, how='left', suffixes=('_PROD', '_ACP'), indicator=True)
     self.df_right = pd.merge(self.data_prod, self.data_acp, on=self.key_column, how='right', suffixes=('_PROD', '_ACP'), indicator=True)
 
-  def exclusives_prod(self):
+  def get_exclusives_prod(self):
     # Filtro apenas os exclusivos
     df = self.df_left[self.df_left['_merge'] == 'left_only'].copy()
     df['Status_Comparacao'] = 'Exclusivo em Prod (Faltando em ACP)'
     df.drop(columns=['_merge'], inplace=True)
     return df
 
-  def exclusives_acp(self):
+  def get_exclusives_acp(self):
     # Filtro apenas os exclusivos
     df = self.df_right[self.df_right['_merge'] == 'right_only'].copy()
     df['Status_Comparacao'] = 'Exclusivo em ACP (Faltando em Prod)'
