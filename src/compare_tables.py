@@ -21,4 +21,7 @@ class CompareTables:
     df = self.df_right[self.df_right['_merge'] == 'right_only'].copy()
     df['Status_Comparacao'] = 'Exclusivo em ACP (Faltando em Prod)'
     df.drop(columns=['_merge'], inplace=True)
-    return df
+
+    # Limpeza de colunas do Prod que ficam na aba de ACP
+    requiered_columns = [self.key_column, 'Status_Comparacao'] + [col for col in df.columns if col.endswith('_ACP')]
+    return df[requiered_columns].copy()
