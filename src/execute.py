@@ -1,4 +1,4 @@
-from Main import Main
+from main import Main
 
 FILE_CSV_PROD = 'AT_PREPARE_STEP_PROD' 
 FILE_CSV_ACP = 'AT_PREPARE_STEP_ACP'
