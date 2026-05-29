@@ -6,29 +6,13 @@ from compare_tables import CompareTables
 from generate_report import GenerateReport
 from sqlScriptGenerator import SqlScriptGenerator
 
-# GENERATE_REPORT = True
-
-# FILE_CSV_PROD = 'AT_PREPARE_STEP_PROD' 
-# FILE_CSV_ACP = 'AT_PREPARE_STEP_ACP'
-# CSV_PATH = r'..\data_csv'
-
-# SELECTED_COLUMNS_TO_COMPARE_DIFFERENCES = ['Name', 'ValidFrom', 'ValidTo']
-# SELECTED_COLUMNS_INSERT = ['Facility', 'StepCode', 'Name', 'CreatedBy',]
-
-# IGNORE_COLUMNS_INSERT = [
-#   'Facility',	'StepCode',	'Name',
-# ]
-
-# PATTERN_VALUES_INSERT = {
-#   'CreatedBy': 'System',
-# } 
 
 print("Carregando configurações...")
 try:
   with open('config.json', 'r', encoding='utf-8') as file:
     config = json.load(file)
 except FileNotFoundError:
-  print("\n❌ ERRO: Arquivo 'config.json' não encontrado na pasta!")
+  print("Arquivo 'config.json' não encontrado")
   sys.exit(1)
 
 # variaveis do json
@@ -42,7 +26,6 @@ SELECTED_COLUMNS_INSERT = config.get("SELECTED_COLUMNS_INSERT", [])
 IGNORE_COLUMNS_INSERT = config.get("IGNORE_COLUMNS_INSERT", [])
 PATTERN_VALUES_INSERT = config.get("PATTERN_VALUES_INSERT", {})
 
-# (Para o SQL Generator, presumimos que a tabela leva o nome do arquivo sem o último bloco)
 NOME_TABELA_BANCO = '_'.join(FILE_CSV_PROD.split('_')[:-1])
 
 print("Carregando arquivos...")
