@@ -8,23 +8,29 @@ class CompareTables:
 
     self.df_left = pd.merge(self.data_prod, self.data_acp, on=self.key_column, how='left', suffixes=('_PROD', '_ACP'), indicator=True)
     self.df_right = pd.merge(self.data_prod, self.data_acp, on=self.key_column, how='right', suffixes=('_PROD', '_ACP'), indicator=True)
-    self.df_both = pd.merge(self.data_prod, self.data_acp, on=self.key_column, how='both', suffixes=('_PROD', '_ACP'), indicator=True)
 
-  def get_both_differences(self):
+  def get_both_differences(self, selected_columns=None):
     df_both = self.df_left[self.df_left['_merge'] == 'both'].copy()
     
-    base_columns = [col.replace('_PROD', '') for col in df_both.columns if col.endswith('_PROD')]
-    has_changes = False
-    for col in base_columns:
-      # Compara se a coluna PROD é diferente da coluna ACP correspondente
-      diverge = df_both[f'{col}_PROD'] != df_both[f'{col}_ACP']
-      has_changes = has_changes | diverge
+    # Se a lista existir, usa ela. Se não, varre todas as colunas.
+    if selected_columns:
+        colunas_base = [col for col in selected_columns if f'{col}_PROD' in df_both.columns]
+    else:
+        colunas_base = [col.replace('_PROD', '') for col in df_both.columns if col.endswith('_PROD')]
     
-    df_divergencias = df_both[has_changes].copy() # copia apenas as linhas que tem divergências
-    df_divergencias.drop(columns=['_merge'], inplace=True)
+    has_differencess = False
+    for col in colunas_base:
+        prod_val = df_both[f'{col}_PROD']
+        acp_val = df_both[f'{col}_ACP']
+        
+        diverge = (prod_val != acp_val) & ~(prod_val.isna() & acp_val.isna())
+        has_differencess = has_differencess | diverge 
+        
+    df_divergences = df_both[has_differencess].copy()
+    df_divergences.drop(columns=['_merge'], inplace=True)
     
-    return df_divergencias
-
+    return df_divergences
+  
   def get_exclusives_prod(self):
     # Filtro apenas os exclusivos
     df = self.df_left[self.df_left['_merge'] == 'left_only'].copy()

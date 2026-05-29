@@ -4,11 +4,13 @@ from environment_data import EnvironmentData
 from compare_tables import CompareTables
 from generate_report import GenerateReport
 
-GENERATE_REPORT = False
+GENERATE_REPORT = True
 
 FILE_CSV_PROD = 'AT_PREPARE_STEP_PROD' 
 FILE_CSV_ACP = 'AT_PREPARE_STEP_ACP'
 CSV_PATH = r'..\data_csv'
+
+SELECTED_COLUMNS_TO_COMPARE_DIFFERENCES = ['Name', 'ValidFrom', 'ValidTo']
 
 print("Carregando arquivos...")
 try:
@@ -20,16 +22,18 @@ except FileNotFoundError as erro:
 
 print("Cruzando dados...")
 auditor = CompareTables(data_prod, data_acp, key_column='ID')
-exclusivos_prod = auditor.get_exclusives_prod()
-exclusivos_acp = auditor.get_exclusives_acp()
+exclusive_prod = auditor.get_exclusives_prod()
+exclusive_acp = auditor.get_exclusives_acp()
+divergences = auditor.get_both_differences(selected_columns=SELECTED_COLUMNS_TO_COMPARE_DIFFERENCES)
 
-print(f"- Qty exclusivo em Prod: {len(exclusivos_prod)}")
-print(f"- Qty exclusivo em ACP: {len(exclusivos_acp)}")
+print(f"- Qty exclusivo em Prod: {len(exclusive_prod)}")
+print(f"- Qty exclusivo em ACP: {len(exclusive_acp)}")
+print(f"- Qty com divergências: {len(divergences)}")
 
 if GENERATE_REPORT:
   print("Gerando Relatorio...")
   prefix_file_name = '_'.join(FILE_CSV_PROD.split('_')[:-1])
-  relatorio = GenerateReport(exclusivos_prod, exclusivos_acp, prefix_file_name)
+  relatorio = GenerateReport(exclusive_prod, exclusive_acp, divergences, prefix_file_name, selected_columns=SELECTED_COLUMNS_TO_COMPARE_DIFFERENCES)
   relatorio.generate_excel()
 
 print("Análise concluída com sucesso!")
