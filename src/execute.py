@@ -3,6 +3,7 @@ import sys
 from environment_data import EnvironmentData
 from compare_tables import CompareTables
 from generate_report import GenerateReport
+from sqlScriptGenerator import SqlScriptGenerator
 
 GENERATE_REPORT = True
 
@@ -11,10 +12,15 @@ FILE_CSV_ACP = 'AT_PREPARE_STEP_ACP'
 CSV_PATH = r'..\data_csv'
 
 SELECTED_COLUMNS_TO_COMPARE_DIFFERENCES = ['Name', 'ValidFrom', 'ValidTo']
+SELECTED_COLUMNS_INSERT = ['Facility', 'StepCode', 'Name']
 
-NOME_TABELA_BANCO = 'AT_PREPARE_STEP' 
-# Escolha a direção: 'PROD_PARA_ACP' (Pega o valor de Prod e joga no ACP) ou 'ACP_PARA_PROD'
-DIRECAO_CORRECAO = 'PROD_PARA_ACP'
+IGNORE_COLUMNS_INSERT = [
+  'Facility',	'StepCode',	'Name',
+]
+
+PATTERN_VALUES_INSERT = {
+  'CreatedBy': 'System',
+} 
 
 print("Carregando arquivos...")
 try:
@@ -34,15 +40,33 @@ print(f"- Qty exclusivo em Prod: {len(exclusive_prod)}")
 print(f"- Qty exclusivo em ACP: {len(exclusive_acp)}")
 print(f"- Qty com divergências: {len(divergences)}")
 
+# Instancia o gerador de SQL
+sql_generator = SqlScriptGenerator(
+    table_name='_'.join(FILE_CSV_PROD.split('_')[:-1]),
+    selected_columns_update=SELECTED_COLUMNS_TO_COMPARE_DIFFERENCES,
+    ignore_columns_insert=IGNORE_COLUMNS_INSERT,
+    pattern_values_insert=PATTERN_VALUES_INSERT,
+    selected_columns_insert=SELECTED_COLUMNS_INSERT
+)
+
+#  Modifica as tabelas adicionando os scripts
+divergences = sql_generator.generate_update_scripts(divergences)
+exclusive_prod = sql_generator.generate_insert_scripts(exclusive_prod, '_PROD')
+exclusive_acp = sql_generator.generate_insert_scripts(exclusive_acp, '_ACP')
+
+
+# Passa as tabelas já prontas para o Relatório
 if GENERATE_REPORT:
   print("Gerando Relatorio...")
-  table_name = '_'.join(FILE_CSV_PROD.split('_')[:-1])
+  prefix_file_name = '_'.join(FILE_CSV_PROD.split('_')[:-1])
   # relatorio = GenerateReport(exclusive_prod, exclusive_acp, divergences, prefix_file_name, selected_columns=SELECTED_COLUMNS_TO_COMPARE_DIFFERENCES)
-  relatorio = GenerateReport(
-    exclusive_prod, exclusive_acp, divergences, table_name, 
-    SELECTED_COLUMNS_TO_COMPARE_DIFFERENCES,
-    DIRECAO_CORRECAO
+relatorio = GenerateReport(
+    exclusives_prod=exclusive_prod, 
+    exclusives_acp=exclusive_acp, 
+    divergences=divergences, 
+    file_prefix=prefix_file_name, 
+    selected_columns_update=SELECTED_COLUMNS_TO_COMPARE_DIFFERENCES
 )
-  relatorio.generate_excel()
+relatorio.generate_excel()
 
 print("Análise concluída com sucesso!")
