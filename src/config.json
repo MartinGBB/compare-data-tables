@@ -1,0 +1,29 @@
+{
+  "GENERATE_REPORT": true,
+  "CSV_PATH": "../data_csv",
+
+  "FILE_CSV_PROD": "AT_PREPARE_STEP_PROD",
+  "FILE_CSV_ACP": "AT_PREPARE_STEP_ACP",
+
+  "SELECTED_COLUMNS_TO_COMPARE_DIFFERENCES": [
+    "Name", 
+    "ValidFrom", 
+    "ValidTo"
+  ],
+
+  "SELECTED_COLUMNS_INSERT": [
+    "Facility", 
+    "StepCode", 
+    "Name", 
+    "CreatedBy"
+  ],
+  
+  "IGNORE_COLUMNS_INSERT": [ 
+    "Facility", 
+    "StepCode", 
+    "Name"
+  ],
+  "PATTERN_VALUES_INSERT": {
+    "CreatedBy": "System"
+  }
+}
