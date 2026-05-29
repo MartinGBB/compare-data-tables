@@ -6,7 +6,6 @@ from compare_tables import CompareTables
 from generate_report import GenerateReport
 from sqlScriptGenerator import SqlScriptGenerator
 
-
 print("Carregando configurações...")
 try:
   with open('config.json', 'r', encoding='utf-8') as file:
