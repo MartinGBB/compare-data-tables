@@ -12,6 +12,10 @@ CSV_PATH = r'..\data_csv'
 
 SELECTED_COLUMNS_TO_COMPARE_DIFFERENCES = ['Name', 'ValidFrom', 'ValidTo']
 
+NOME_TABELA_BANCO = 'AT_PREPARE_STEP' 
+# Escolha a direção: 'PROD_PARA_ACP' (Pega o valor de Prod e joga no ACP) ou 'ACP_PARA_PROD'
+DIRECAO_CORRECAO = 'PROD_PARA_ACP'
+
 print("Carregando arquivos...")
 try:
   data_prod = EnvironmentData('PROD', CSV_PATH, FILE_CSV_PROD).load_data()
@@ -32,8 +36,13 @@ print(f"- Qty com divergências: {len(divergences)}")
 
 if GENERATE_REPORT:
   print("Gerando Relatorio...")
-  prefix_file_name = '_'.join(FILE_CSV_PROD.split('_')[:-1])
-  relatorio = GenerateReport(exclusive_prod, exclusive_acp, divergences, prefix_file_name, selected_columns=SELECTED_COLUMNS_TO_COMPARE_DIFFERENCES)
+  table_name = '_'.join(FILE_CSV_PROD.split('_')[:-1])
+  # relatorio = GenerateReport(exclusive_prod, exclusive_acp, divergences, prefix_file_name, selected_columns=SELECTED_COLUMNS_TO_COMPARE_DIFFERENCES)
+  relatorio = GenerateReport(
+    exclusive_prod, exclusive_acp, divergences, table_name, 
+    SELECTED_COLUMNS_TO_COMPARE_DIFFERENCES,
+    DIRECAO_CORRECAO
+)
   relatorio.generate_excel()
 
 print("Análise concluída com sucesso!")
