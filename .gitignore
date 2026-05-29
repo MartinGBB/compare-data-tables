@@ -1,6 +1,5 @@
 venv/
 .venv/
-data_csv/*
 
 !data_csv/.gitkeep
 
@@ -14,3 +13,5 @@ __pycache__/
 
 Thumbs.db
 .DS_Store
+
+src/config.json
